@@ -30,13 +30,13 @@
 					</thead>
 					<tbody>
 						<tr data-key="0" onclick="selectRow('#tableLeft', 0)">
-							<td>Key1</td>
-							<td>Type1</td>
+							<td class="label-cell">Key1</td>
+							<td class="type-cell">Type1</td>
 							<td><a href="#" data-bs-toggle="modal" data-bs-target="#myModal">Link1</a></td>
 						</tr>
 						<tr data-key="1" onclick="selectRow('#tableLeft', 1)">
-							<td>Key2</td>
-							<td>Type2</td>
+							<td class="label-cell">Key2</td>
+							<td class="type-cell">Type2</td>
 							<td><a href="#" data-bs-toggle="modal" data-bs-target="#myModal">Link2</a></td>
 						</tr>
 					</tbody>
@@ -45,7 +45,7 @@
 					<button type="button" class="btn btn-primary">Generate</button>
 					<button type="button" class="btn btn-secondary">Import</button>
 					<button type="button" class="btn btn-secondary">Export</button>
-					<button type="button" class="btn btn-danger">Delete</button>
+					<button id="key-delete-btn" disabled type="button" class="btn btn-danger">Delete</button>
 				</div>
 			</div>
 			<!-- Right Column -->
@@ -54,29 +54,31 @@
 				<table id="tableRight" class="table">
 					<thead>
 						<tr>
-							<th>Filename</th>
+							<th>Encrypted File</th>
 							<th>Encryption Type</th>
 							<th>Key Label</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr data-key="0" onclick="selectRow('#tableRight', 0)">
-							<td>File1</td>
-							<td>Encryption1</td>
-							<td>Key1</td>
+							<td class="filename-cell">File1</td>
+							<td class="type-cell">Encryption1</td>
+							<td class="label-cell">Key1</td>
 						</tr>
 						<tr data-key="1" onclick="selectRow('#tableRight', 1)">
-							<td>File2</td>
-							<td>Encryption2</td>
-							<td>Key2</td>
+							<td class="filename-cell">File2</td>
+							<td class="type-cell">Encryption2</td>
+							<td class="label-cell">Key2</td>
 						</tr>
 					</tbody>
 				</table>
 				<div class="d-flex justify-content-around" style="width: 80%">
-					<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">Upload</button>
-					<button type="button" class="btn btn-secondary">Download</button>
-					<button type="button" class="btn btn-secondary">Rename</button>
-					<button type="button" class="btn btn-danger">Delete</button>
+					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
+						data-bs-target="#uploadModal">Upload</button>
+					<button id="download-btn" type="button" disabled class="btn btn-secondary" data-bs-toggle="modal"
+						data-bs-target="#downloadModal">Download</button>
+					<button id="rename-btn" type="button" disabled class="btn btn-secondary">Rename</button>
+					<button id="file-delete-btn" type="button" disabled class="btn btn-danger">Delete</button>
 				</div>
 			</div>
 		</div>
@@ -141,6 +143,45 @@
 		</div>
 	</div>
 
+	<!-- Download Modal -->
+	<div class="modal fade" id="downloadModal" tabindex="-1" role="dialog" aria-labelledby="downloadModalLabel"
+		aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="downloadModalLabel">Download File</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="form-group d-flex justify-content-around">
+						<div>
+							<label for="download-filename-text" class="col-form-label fw-bold">Encrypted File</label>
+							<p id="download-filename-text">filename</p>
+						</div>
+						<div>
+							<label for="download-type-text" class="col-form-label fw-bold">Encryption Type</label>
+							<p id="download-type-text">type</p>
+						</div>
+						<div>
+							<label for="download-label-text" class="col-form-label fw-bold">Key Label</label>
+							<p id="download-label-text">label</p>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="download-key-select" class="col-form-label">Select Key:</label>
+						<select class="form-control" id="download-key-select">
+							<option value="" selected disabled>Select a Key</option>
+							<!-- Options will be added dynamically via JavaScript -->
+						</select>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" id="modal-download-btn">Download</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
 	<script>
 		// Global variables for selected keys
@@ -156,8 +197,12 @@
 			// Store selected key as global variable
 			if (table == '#tableLeft') {
 				selectedKeyLeft = key;
+				$("#key-delete-btn").prop("disabled", false);
 			} else if (table == '#tableRight') {
 				selectedKeyRight = key;
+				$("#download-btn").prop("disabled", false);
+				$("#rename-btn").prop("disabled", false);
+				$("#file-delete-btn").prop("disabled", false);
 			}
 		}
 
@@ -189,6 +234,63 @@
 				}
 			});
 		});
+
+		// Handle click on Download button in row
+		$("#download-btn").on("click", function () {
+			// Get filename, encryption type, and key label
+			// selectedKeyRight = $("#tableRight tbody tr.table-primary").data("key");
+			var selected = $("#tableRight tbody tr[data-key='" + selectedKeyRight + "']");
+			// .find(".filename-cell").text();
+			var filename = selected.find(".filename-cell").text();
+			var type = selected.find(".type-cell").text();
+			var label = selected.find(".label-cell").text();
+
+			// Set filename text in modal
+			$("#download-filename-text").text(filename);
+			$("#download-type-text").text(type);
+			$("#download-label-text").text(label);
+
+			// Clear previous options in key select
+			$("#download-key-select").empty();
+
+			// Add options for each row in tableLeft
+			$("#tableLeft tbody tr").each(function (index) {
+				var label = $(this).find(".label-cell").text();
+				var type = $(this).find(".type-cell").text();
+				var key = label + "-" + type;
+
+				$("#download-key-select").append($('<option>', {
+					value: index,
+					text: key
+				}));
+			});
+
+			// Show modal
+			$("#downloadModal").modal("show");
+		});
+
+		// Handle click on Download button in modal
+		$("#modal-download-btn").on("click", function () {
+			// TODO
+			// Get selected key index
+			var keyIndex = $("#download-key-select").val();
+
+			// Get passphrase or public key based on encryption type
+			var encryptionType = $("#tableLeft tbody tr").eq(keyIndex).find(".type-cell").text();
+			var passphraseOrPublicKey;
+
+			if (encryptionType === "Passphrase") {
+				passphraseOrPublicKey = $("#download-passphrase").val();
+			} else if (encryptionType === "Public Key") {
+				passphraseOrPublicKey = $("#download-public-key").val();
+			}
+
+			// TODO: Implement download functionality
+
+			// Hide modal
+			$("#downloadModal").modal("hide");
+		});
+
 
 	</script>
 
