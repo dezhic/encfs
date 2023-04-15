@@ -21,6 +21,8 @@ $('#generateKeyPairBtn').click(function () {
             "spki",
             keyPair.publicKey
         ).then((publicKey) => {
+            console.log('pubKey before encoding');
+            console.log(new Uint8Array(publicKey));
             pubB64 = arrayBufferToBase64(publicKey);
             $('#publicKeyTextarea').val(pubB64);
         });

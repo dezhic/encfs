@@ -1,5 +1,6 @@
 const { passphraseEnc, passphraseDec } = require("./aes");
 const { rsaEnc, rsaDec } = require("./rsa");
+const { base64ToArrayBuffer, arrayBufferToBase64 } = require("./utils");
 
 let fileContent;
 let fileMetadata;
@@ -56,14 +57,40 @@ $("#modal-upload-btn").click(function () {
     }
     let key = JSON.parse(localStorage.getItem('keys'))[keyIdx];
 
+    $('#modal-upload-btn').prop('disabled', true);
+    $('#modal-upload-btn').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Encrypting...');
+
     if (keyType === 'passphrase') {
         let passphrase = key.content;
-        contentCipher = passphraseEnc(fileContent, passphrase);
-        metadataCipher = passphraseEnc(JSON.stringify(fileMetadata), passphrase);
+        passphraseEnc(JSON.stringify(fileMetadata), passphrase).then((cipher) => {
+            metadataCipher = cipher;
+            console.log("metadataCipher: ");
+            console.log(metadataCipher);
+        });
+
+        passphraseEnc(arrayBufferToBase64(fileContent), passphrase).then((cipher) => {
+            contentCipher = cipher;
+            console.log("contentCipher: ");
+            console.log(contentCipher);
+            $('#modal-upload-btn').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...');
+        });
+
     } else if (keyType === 'publicKey') {
-        let publicKey = key.content;
-        contentCipher = rsaEnc(fileContent, publicKey);
-        metadataCipher = rsaEnc(JSON.stringify(fileMetadata), publicKey);
+        let publicKey = base64ToArrayBuffer(key.content);
+
+        rsaEnc(base64ToArrayBuffer(btoa(JSON.stringify(fileMetadata))), publicKey).then((cipher) => {
+            metadataCipher = cipher;
+            console.log("metadataCipher: ");
+            console.log(metadataCipher);
+            rsaEnc(fileContent, publicKey).then((cipher) => {
+                contentCipher = cipher;
+                console.log("contentCipher: ");
+                console.log(contentCipher);
+                $('#modal-upload-btn').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...');
+            });
+        });
+
+
     } else {
         alert("Please select an encryption type.");
         return;
