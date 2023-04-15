@@ -107,6 +107,25 @@
 						<input type="text" class="form-control" id="filenameInput">
 					</div>
 					<div class="form-group">
+						<label for="upload-key-type">Encryption Type: </label>
+						<div id="upload-key-type">
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="keyType" id="uploadPassphraseType"
+									value="passphrase" checked>
+								<label class="form-check-label" for="uploadPassphraseType">
+									Passphrase
+								</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="keyType" id="uploadPublicKeyType"
+									value="publicKey">
+								<label class="form-check-label" for="uploadPublicKeyType">
+									Public Key
+								</label>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
 						<label for="upload-key-select" class="col-form-label">Select Key:</label>
 						<select class="form-control" id="upload-key-select">
 							<!-- Options will be added dynamically via JavaScript -->
