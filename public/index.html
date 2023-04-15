@@ -266,11 +266,13 @@
 				for (let i = 0; i < keys.length; i++) {
 					// Create row
 					let row = $('<tr>');
-					row.append($('<td>').text(keys[i].label));
-					row.append($('<td>').text(keys[i].type));
+					let labelCell = $('<td>').text(keys[i].label).addClass('label-cell');
+					let typeCell = $('<td>').text(keys[i].type).addClass('type-cell');
 					let contentDiv = $('<div>').text(keys[i].content).css('overflow-x', 'auto');
-					let content = $('<td>').append(contentDiv);
-					row.append(content);
+					let contentCell = $('<td>').append(contentDiv);
+					row.append(labelCell);
+					row.append(typeCell);
+					row.append(contentCell);
 					row.attr('data-key', i);
 					row.click(() => selectRow('#tableLeft', i));
 					// Append row to table
