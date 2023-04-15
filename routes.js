@@ -1,4 +1,5 @@
 var express = require('express');
+var controller = require('./controller');
 var router = express.Router();
 
 /* GET home page. */
@@ -12,7 +13,7 @@ router.get('/metadata');
 
 router.get('/content');
 
-router.post('/upload');
+router.post('/upload', controller.upload);
 
 router.post('/rename');
 
