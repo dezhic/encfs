@@ -65,6 +65,11 @@ $('#saveKeyBtn').click(function () {
         return;
     }
 
+    if (allKeys.some((key) => key.label === label)) {
+        alert('Label already exists.');
+        return;
+    }
+
     if (type === 'publicKey') {
         if (pubB64 == null || privB64 == null) {
             alert('Please generate a key pair first.');
@@ -158,6 +163,37 @@ $('#uploadFileInput').change(function () {
     }
 });
 
+
+let contentCipher, metadataCipher;
+$("#modal-upload-btn").click(function () {
+    if (fileContent == null || fileMetadata == null) {
+        alert("Please select a file to upload.");
+        return;
+    }
+
+    let keyType = $('input[name="uploadKeyType"]:checked').val();
+    let keyIdx = $("#upload-key-select").val();
+    if (keyIdx === null) {
+        alert("Please select a key.");
+        return;
+    }
+    let key = JSON.parse(localStorage.getItem('keys'))[keyIdx];
+
+    if (keyType === 'passphrase') {
+        let passphrase = key.content;
+        contentCipher = passphraseEnc(fileContent, passphrase);
+        metadataCipher = passphraseEnc(JSON.stringify(fileMetadata), passphrase);
+    } else if (keyType === 'publicKey') {
+        let publicKey = key.content;
+        contentCipher = rsaEnc(fileContent, publicKey);
+        metadataCipher = rsaEnc(JSON.stringify(fileMetadata), publicKey);
+    } else {
+        alert("Please select an encryption type.");
+        return;
+    }
+
+
+});
 
 },{"./aes":2,"./rsa":5}],7:[function(require,module,exports){
 module.exports.arrayBufferToBase64 = function (buffer) {

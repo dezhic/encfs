@@ -121,7 +121,7 @@
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-					<button type="button" class="btn btn-primary" id="uploadBtn">Upload</button>
+					<button type="button" class="btn btn-primary" id="modal-upload-btn">Upload</button>
 				</div>
 			</div>
 		</div>
@@ -233,17 +233,17 @@
 		var selectedKeyRight = null;
 
 		// Function to handle row selection
-		function selectRow(table, key) {
+		function selectRow(table, idx) {
 			// Clear previous selection
 			$(table + ' tbody tr').removeClass('table-primary').removeClass('table-secondary');
 			// Add selection to current row
-			$(table + ' tbody tr[data-key="' + key + '"]').addClass('table-primary');
+			$(table + ' tbody tr[data-key="' + idx + '"]').addClass('table-primary');
 			// Store selected key as global variable
 			if (table == '#tableLeft') {
-				selectedKeyLeft = key;
+				selectedKeyLeft = idx;
 				$("#key-delete-btn").prop("disabled", false);
 			} else if (table == '#tableRight') {
-				selectedKeyRight = key;
+				selectedKeyRight = idx;
 				$("#download-btn").prop("disabled", false);
 				$("#rename-btn").prop("disabled", false);
 				$("#file-delete-btn").prop("disabled", false);
@@ -306,14 +306,19 @@
 
 			// Add options for each row in tableLeft
 			$("#tableLeft tbody tr")
-				.filter(function () {
-					if ($('input[name="uploadKeyType"]:checked').val() === 'passphrase') {
-						return $(this).find(".type-cell").text() === "Passphrase";
-					} else {
-						return $(this).find(".type-cell").text() === "RSA Public Key";
-					}
-				})
 				.each(function (index) {
+					// filter key type
+					// not using .filter() because we want to keep the index
+					if ($('input[name="uploadKeyType"]:checked').val() === 'passphrase') {
+						if ($(this).find(".type-cell").text() !== "Passphrase") {
+							return;
+						}
+					} else {
+						if ($(this).find(".type-cell").text() !== "RSA Public Key") {
+							return;
+						}
+					}
+
 					var label = $(this).find(".label-cell").text();
 					var type = $(this).find(".type-cell").text();
 					var key = label + "-" + type;
