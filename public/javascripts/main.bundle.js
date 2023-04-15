@@ -257,69 +257,62 @@ $("#modal-upload-btn").click(function () {
     $('#modal-upload-btn').prop('disabled', true);
     $('#modal-upload-btn').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Encrypting...');
 
+    function upload() {
+        // Upload file
+        let filename = $('#encNameInput').val();
+        $.ajax({
+            url: "/upload",
+            type: "POST",
+            data: JSON.stringify({
+                filename: filename,
+                contentCipher: contentCipher,
+                metadataCipher: metadataCipher,
+                keyType: keyType,
+                keyLabel: key.label
+            }),
+            contentType: "application/json",
+            success: function (data, status) {
+                if (data.status === "error") {
+                    alert(data.message);
+                } else {
+                    alert("File uploaded successfully.");
+                    $('#modal-upload-btn').html('Upload');
+                    $('#modal-upload').modal('hide');
+                    location.reload();
+                }
+            }
+        });
+    }
+
     if (keyType === 'passphrase') {
         let passphrase = key.content;
         passphraseEnc(JSON.stringify(fileMetadata), passphrase).then((cipher) => {
             metadataCipher = cipher;
             console.log("metadataCipher: ");
             console.log(metadataCipher);
+            passphraseEnc(arrayBufferToBase64(fileContent), passphrase).then((cipher) => {
+                contentCipher = cipher;
+                console.log("contentCipher: ");
+                console.log(contentCipher);
+                $('#modal-upload-btn').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...');
+                upload();
+            });
         });
 
-        passphraseEnc(arrayBufferToBase64(fileContent), passphrase).then((cipher) => {
-            contentCipher = cipher;
-            console.log("contentCipher: ");
-            console.log(contentCipher);
-            $('#modal-upload-btn').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...');
-        });
 
     } else if (keyType === 'publicKey') {
         let publicKey = base64ToArrayBuffer(key.content);
 
         rsaEnc(base64ToArrayBuffer(btoa(JSON.stringify(fileMetadata))), publicKey).then((cipher) => {
-            metadataCipher = cipher;
+            metadataCipher = arrayBufferToBase64(cipher);
             console.log("metadataCipher: ");
             console.log(metadataCipher);
             rsaEnc(fileContent, publicKey).then((cipher) => {
-                contentCipher = cipher;
+                contentCipher = arrayBufferToBase64(cipher);
                 console.log("contentCipher: ");
                 console.log(contentCipher);
                 $('#modal-upload-btn').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...');
-                
-                // Upload file
-                let filename = $('#encNameInput').val();
-                // $.post("/upload", { filename, contentCipher, metadataCipher, keyType, keyLabel: key.label }, function (data, status) {
-                //     if (data.status === "error") {
-                //         alert(data.message);
-                //     } else {
-                //         alert("File uploaded successfully.");
-                //         $('#modal-upload-btn').prop('disabled', false);
-                //         $('#modal-upload-btn').html('Upload');
-                //         $('#modal-upload').modal('hide');
-                //         location.reload();
-                //     }
-                // });
-                $.ajax({
-                    url: "/upload",
-                    type: "POST",
-                    data: JSON.stringify({
-                        filename: filename,
-                        contentCipher: contentCipher,
-                        metadataCipher: metadataCipher,
-                        keyType: keyType,
-                        keyLabel: key.label
-                    }),
-                    contentType: "application/json",
-                    success: function (data, status) {
-                        if (data.status === "error") {
-                            alert(data.message);
-                        } else {
-                            alert("File uploaded successfully.");
-                            $('#modal-upload-btn').html('Upload');
-                            $('#modal-upload').modal('hide');
-                            location.reload();
-                        }
-                    }
-                });
+                upload();
             });
         });
 
