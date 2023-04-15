@@ -20,25 +20,16 @@
 			<!-- Left Column -->
 			<div class="col-md-6">
 				<h2>Keys</h2>
-				<table id="tableLeft" class="table">
+				<table id="tableLeft" class="table" style="width: 100%; table-layout: fixed;">
 					<thead>
 						<tr>
-							<th>Label</th>
-							<th>Type</th>
-							<th>Content</th>
+							<th style="width: 25%;">Label</th>
+							<th style="width: 25%;">Type</th>
+							<th style="width: 50%;">Content</th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr data-key="0" onclick="selectRow('#tableLeft', 0)">
-							<td class="label-cell">Key1</td>
-							<td class="type-cell">Type1</td>
-							<td><a href="#" data-bs-toggle="modal" data-bs-target="#myModal">Link1</a></td>
-						</tr>
-						<tr data-key="1" onclick="selectRow('#tableLeft', 1)">
-							<td class="label-cell">Key2</td>
-							<td class="type-cell">Type2</td>
-							<td><a href="#" data-bs-toggle="modal" data-bs-target="#myModal">Link2</a></td>
-						</tr>
+						<!-- updated by js -->
 					</tbody>
 				</table>
 				<div class="d-flex justify-content-around" style="width: 80%">
@@ -211,7 +202,7 @@
 					</div>
 
 					<div class="d-none align-items-center mt-3" id="publicKeySection">
-						<button type="button" class="btn btn-primary" id="generatePublicKeyBtn">Generate Key
+						<button type="button" class="btn btn-primary" id="generateKeyPairBtn">Generate Key
 							Pair</button>
 						<div class="ms-3">
 							<div class="form-group">
@@ -262,7 +253,33 @@
 				$("#file-delete-btn").prop("disabled", false);
 			}
 		}
-
+		
+		// Render Key Table
+		function renderKeyTable() {
+			// Clear table
+			$('#tableLeft tbody').empty();
+			// Get keys from local storage
+			var keys = JSON.parse(localStorage.getItem('keys'));
+			// If keys exist, render table
+			if (keys) {
+				// Loop through keys
+				for (let i = 0; i < keys.length; i++) {
+					// Create row
+					let row = $('<tr>');
+					row.append($('<td>').text(keys[i].label));
+					row.append($('<td>').text(keys[i].type));
+					let contentDiv = $('<div>').text(keys[i].content).css('overflow-x', 'auto');
+					let content = $('<td>').append(contentDiv);
+					row.append(content);
+					row.attr('data-key', i);
+					row.click(() => selectRow('#tableLeft', i));
+					// Append row to table
+					$('#tableLeft tbody').append(row);
+				}
+			}
+		}
+		renderKeyTable();
+		
 		$(document).ready(function () {
 			// Function to handle deselection of rows when clicking outside tables
 			$(document).on('click', function (event) {
@@ -380,19 +397,6 @@
 				$('#passphraseSection').removeClass('d-none').addClass('d-block');
 				$('#publicKeySection').addClass('d-none').removeClass('d-block');
 			}
-		});
-
-		// Generate public key and private key
-		$('#generatePublicKeyBtn').click(function () {
-			// TODO: Implement key generation logic here
-			$('#publicKeyTextarea').val('dummy public key');
-			$('#privateKeyTextarea').val('dummy private key');
-		});
-
-		// Save key
-		$('#saveKeyBtn').click(function () {
-			// TODO: Implement key saving logic here
-			$('#keyGenerationModal').modal('hide');
 		});
 
 	</script>
