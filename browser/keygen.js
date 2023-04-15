@@ -40,7 +40,7 @@ $('#saveKeyBtn').click(function () {
         allKeys = [];
     }
 
-    let type = $('input[name="keyType"]:checked').val();
+    let type = $('input[name="genKeyType"]:checked').val();
     let label = $('#keyLabelInput').val();
 
     if (label === '') {

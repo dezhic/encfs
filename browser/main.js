@@ -1,2 +1,2 @@
-require('./pass-enc');
+require('./upload');
 require('./keygen');

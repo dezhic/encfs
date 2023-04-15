@@ -86,30 +86,26 @@
 				</div>
 				<div class="modal-body">
 					<div class="mb-3">
-						<label for="fileSelection" class="form-label">Plain File</label>
-						<div class="input-group">
-							<input type="text" class="form-control" id="fileSelection" readonly>
-							<button class="btn btn-outline-secondary" type="button" id="selectFileBtn">Select
-								File...</button>
-						</div>
+						<label for="uploadFileInput" class="form-label">Plain File</label>
+						<input type="file" class="form-control" id="uploadFileInput" readonly>
 					</div>
 					<div class="mb-3">
-						<label for="filenameInput" class="form-label">Encrypted Filename</label>
-						<input type="text" class="form-control" id="filenameInput">
+						<label for="encNameInput" class="form-label">Encrypted File Name</label>
+						<input type="text" class="form-control" id="encNameInput">
 					</div>
 					<div class="form-group">
 						<label for="upload-key-type">Encryption Type: </label>
 						<div id="upload-key-type">
 							<div class="form-check form-check-inline">
-								<input class="form-check-input" type="radio" name="keyType" id="uploadPassphraseType"
-									value="passphrase" checked>
+								<input class="form-check-input" type="radio" name="uploadKeyType"
+									id="uploadPassphraseType" value="passphrase" checked>
 								<label class="form-check-label" for="uploadPassphraseType">
 									Passphrase
 								</label>
 							</div>
 							<div class="form-check form-check-inline">
-								<input class="form-check-input" type="radio" name="keyType" id="uploadPublicKeyType"
-									value="publicKey">
+								<input class="form-check-input" type="radio" name="uploadKeyType"
+									id="uploadPublicKeyType" value="publicKey">
 								<label class="form-check-label" for="uploadPublicKeyType">
 									Public Key
 								</label>
@@ -182,14 +178,14 @@
 				</div>
 				<div class="modal-body">
 					<div class="form-check form-check-inline">
-						<input class="form-check-input" type="radio" name="keyType" id="passphraseType"
+						<input class="form-check-input" type="radio" name="genKeyType" id="passphraseType"
 							value="passphrase" checked>
 						<label class="form-check-label" for="passphraseType">
 							Passphrase
 						</label>
 					</div>
 					<div class="form-check form-check-inline">
-						<input class="form-check-input" type="radio" name="keyType" id="publicKeyType"
+						<input class="form-check-input" type="radio" name="genKeyType" id="publicKeyType"
 							value="publicKey">
 						<label class="form-check-label" for="publicKeyType">
 							Public Key
@@ -253,7 +249,7 @@
 				$("#file-delete-btn").prop("disabled", false);
 			}
 		}
-		
+
 		// Render Key Table
 		function renderKeyTable() {
 			// Clear table
@@ -281,7 +277,7 @@
 			}
 		}
 		renderKeyTable();
-		
+
 		$(document).ready(function () {
 			// Function to handle deselection of rows when clicking outside tables
 			$(document).on('click', function (event) {
@@ -298,9 +294,7 @@
 			});
 		});
 
-		// Handle click on Upload button
-		$("#upload-btn").click(function () {
-
+		function renderKeyOptions() {
 			// Clear previous options in key select
 			$("#upload-key-select").empty();
 			$("#upload-key-select").append($('<option>', {
@@ -311,18 +305,33 @@
 			}));
 
 			// Add options for each row in tableLeft
-			$("#tableLeft tbody tr").each(function (index) {
-				var label = $(this).find(".label-cell").text();
-				var type = $(this).find(".type-cell").text();
-				var key = label + "-" + type;
+			$("#tableLeft tbody tr")
+				.filter(function () {
+					if ($('input[name="uploadKeyType"]:checked').val() === 'passphrase') {
+						return $(this).find(".type-cell").text() === "Passphrase";
+					} else {
+						return $(this).find(".type-cell").text() === "RSA Public Key";
+					}
+				})
+				.each(function (index) {
+					var label = $(this).find(".label-cell").text();
+					var type = $(this).find(".type-cell").text();
+					var key = label + "-" + type;
 
-				$("#upload-key-select").append($('<option>', {
-					value: index,
-					text: key,
-				}));
-			});
+					$("#upload-key-select").append($('<option>', {
+						value: index,
+						text: key,
+					}));
+				});
+		}
 
-			// Show modal
+		$("input[name='uploadKeyType']").on("change", function () {
+			renderKeyOptions();
+		});
+
+		// Handle click on Upload button
+		$("#upload-btn").click(function () {
+			renderKeyOptions();
 			$("#uploadModal").modal("show");
 		});
 
@@ -391,7 +400,7 @@
 
 		// Handle Key Generation Modal
 		// Show/hide sections based on the selected key type
-		$('input[name="keyType"]').change(function () {
+		$('input[name="genKeyType"]').change(function () {
 			if ($(this).val() === 'publicKey') {
 				$('#publicKeySection').removeClass('d-none').addClass('d-block');
 				$('#passphraseSection').addClass('d-none').removeClass('d-block');
