@@ -42,7 +42,8 @@
 					</tbody>
 				</table>
 				<div class="d-flex justify-content-around" style="width: 80%">
-					<button type="button" class="btn btn-primary">Generate</button>
+					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
+						data-bs-target="#keyGenerationModal">Generate</button>
 					<button type="button" class="btn btn-secondary">Import</button>
 					<button type="button" class="btn btn-secondary">Export</button>
 					<button id="key-delete-btn" disabled type="button" class="btn btn-danger">Delete</button>
@@ -105,7 +106,7 @@
 						<label for="filenameInput" class="form-label">Filename</label>
 						<input type="text" class="form-control" id="filenameInput">
 					</div>
-					<div class="mb-3">
+					<!-- <div class="mb-3">
 						<fieldset>
 							<legend class="form-label">Encryption Type</legend>
 							<div class="form-check">
@@ -133,7 +134,7 @@
 						<textarea class="form-control" id="publicKeyTextarea" rows="5" readonly></textarea>
 						<button class="btn btn-outline-secondary mt-2" type="button" id="selectPublicKeyBtn">Select
 							File...</button>
-					</div>
+					</div> -->
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -183,6 +184,66 @@
 		</div>
 	</div>
 
+	<!-- Key Generation Modal -->
+	<div class="modal fade" id="keyGenerationModal" tabindex="-1" aria-labelledby="keyGenerationModalLabel"
+		aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="keyGenerationModalLabel">Generate a Key</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="form-check form-check-inline">
+						<input class="form-check-input" type="radio" name="keyType" id="passphraseType"
+							value="passphrase" checked>
+						<label class="form-check-label" for="passphraseType">
+							Passphrase
+						</label>
+					</div>
+					<div class="form-check form-check-inline">
+						<input class="form-check-input" type="radio" name="keyType" id="publicKeyType"
+							value="publicKey">
+						<label class="form-check-label" for="publicKeyType">
+							Public Key
+						</label>
+					</div>
+
+					<div id="passphraseSection" class="form-group mt-3">
+						<label for="passphraseInput">Input a passphrase</label>
+						<input type="text" class="form-control" id="passphraseInput"
+							placeholder="Enter a passphrase">
+					</div>
+
+					<div class="d-none align-items-center mt-3" id="publicKeySection">
+						<button type="button" class="btn btn-primary" id="generatePublicKeyBtn">Generate Key Pair</button>
+						<div class="ms-3">
+							<div class="form-group">
+								<label for="publicKeyTextarea">Public Key</label>
+								<textarea class="form-control" id="publicKeyTextarea" rows="5" readonly></textarea>
+							</div>
+							<div class="form-group">
+								<label for="privateKeyTextarea">Private Key</label>
+								<textarea class="form-control" id="privateKeyTextarea" rows="5" readonly></textarea>
+							</div>
+						</div>
+					</div>
+
+					<div class="form-group mt-3">
+						<label for="keyLabelInput">Label</label>
+						<input type="text" class="form-control" id="keyLabelInput"
+							placeholder="Enter a label for the key">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" id="saveKeyBtn">Save</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
 	<script>
 		// Global variables for selected keys
 		var selectedKeyLeft = null;
@@ -222,18 +283,19 @@
 			});
 		});
 
-		$(document).ready(function () {
-			// Show/hide passphrase/public key input fields based on selected encryption type
-			$('input[name="encryptionType"]').change(function () {
-				if ($(this).val() === 'passphrase') {
-					$('#passphraseInput').removeClass('d-none');
-					$('#publicKeyInput').addClass('d-none');
-				} else if ($(this).val() === 'publickey') {
-					$('#passphraseInput').addClass('d-none');
-					$('#publicKeyInput').removeClass('d-none');
-				}
-			});
-		});
+		// Upload Modal
+		// $(document).ready(function () {
+		// 	// Show/hide passphrase/public key input fields based on selected encryption type
+		// 	$('input[name="encryptionType"]').change(function () {
+		// 		if ($(this).val() === 'passphrase') {
+		// 			$('#passphraseInput').removeClass('d-none');
+		// 			$('#publicKeyInput').addClass('d-none');
+		// 		} else if ($(this).val() === 'publickey') {
+		// 			$('#passphraseInput').addClass('d-none');
+		// 			$('#publicKeyInput').removeClass('d-none');
+		// 		}
+		// 	});
+		// });
 
 		// Handle click on Download button in row
 		$("#download-btn").on("click", function () {
@@ -289,6 +351,31 @@
 
 			// Hide modal
 			$("#downloadModal").modal("hide");
+		});
+
+		// Handle Key Generation Modal
+		// Show/hide sections based on the selected key type
+		$('input[name="keyType"]').change(function () {
+			if ($(this).val() === 'publicKey') {
+				$('#publicKeySection').removeClass('d-none').addClass('d-block');
+				$('#passphraseSection').addClass('d-none').removeClass('d-block');
+			} else {
+				$('#passphraseSection').removeClass('d-none').addClass('d-block');
+				$('#publicKeySection').addClass('d-none').removeClass('d-block');
+			}
+		});
+
+		// Generate public key and private key
+		$('#generatePublicKeyBtn').click(function () {
+			// TODO: Implement key generation logic here
+			$('#publicKeyTextarea').val('dummy public key');
+			$('#privateKeyTextarea').val('dummy private key');
+		});
+
+		// Save key
+		$('#saveKeyBtn').click(function () {
+			// TODO: Implement key saving logic here
+			$('#keyGenerationModal').modal('hide');
 		});
 
 
