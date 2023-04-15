@@ -73,7 +73,7 @@
 					</tbody>
 				</table>
 				<div class="d-flex justify-content-around" style="width: 80%">
-					<button type="button" class="btn btn-primary">Upload</button>
+					<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">Upload</button>
 					<button type="button" class="btn btn-secondary">Download</button>
 					<button type="button" class="btn btn-secondary">Rename</button>
 					<button type="button" class="btn btn-danger">Delete</button>
@@ -82,10 +82,66 @@
 		</div>
 	</div>
 
-	<!-- Modal -->
-	<!-- <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class -->
+	<!-- Upload Modal -->
+	<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="uploadModalLabel">Upload File</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="mb-3">
+						<label for="fileSelection" class="form-label">File</label>
+						<div class="input-group">
+							<input type="text" class="form-control" id="fileSelection" readonly>
+							<button class="btn btn-outline-secondary" type="button" id="selectFileBtn">Select
+								File...</button>
+						</div>
+					</div>
+					<div class="mb-3">
+						<label for="filenameInput" class="form-label">Filename</label>
+						<input type="text" class="form-control" id="filenameInput">
+					</div>
+					<div class="mb-3">
+						<fieldset>
+							<legend class="form-label">Encryption Type</legend>
+							<div class="form-check">
+								<input class="form-check-input" type="radio" name="encryptionType" id="passphraseRadio"
+									value="passphrase" checked>
+								<label class="form-check-label" for="passphraseRadio">
+									Passphrase
+								</label>
+							</div>
+							<div class="form-check">
+								<input class="form-check-input" type="radio" name="encryptionType" id="publicKeyRadio"
+									value="publickey">
+								<label class="form-check-label" for="publicKeyRadio">
+									Public Key
+								</label>
+							</div>
+						</fieldset>
+					</div>
+					<div class="mb-3" id="passphraseInput">
+						<label for="passphrase" class="form-label">Passphrase</label>
+						<input type="password" class="form-control" id="passphrase">
+					</div>
+					<div class="mb-3 d-none" id="publicKeyInput">
+						<label for="publicKeyTextarea" class="form-label">Public Key</label>
+						<textarea class="form-control" id="publicKeyTextarea" rows="5" readonly></textarea>
+						<button class="btn btn-outline-secondary mt-2" type="button" id="selectPublicKeyBtn">Select
+							File...</button>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" id="uploadBtn">Upload</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
 	<script>
 		// Global variables for selected keys
 		var selectedKeyLeft = null;
@@ -117,6 +173,19 @@
 					$('#tableRight').find('tr.table-primary').removeClass('table-primary').addClass('table-secondary');
 				} else {
 					$('#tableRight').find('tr.table-secondary').removeClass('table-secondary').addClass('table-primary');
+				}
+			});
+		});
+
+		$(document).ready(function () {
+			// Show/hide passphrase/public key input fields based on selected encryption type
+			$('input[name="encryptionType"]').change(function () {
+				if ($(this).val() === 'passphrase') {
+					$('#passphraseInput').removeClass('d-none');
+					$('#publicKeyInput').addClass('d-none');
+				} else if ($(this).val() === 'publickey') {
+					$('#passphraseInput').addClass('d-none');
+					$('#publicKeyInput').removeClass('d-none');
 				}
 			});
 		});
