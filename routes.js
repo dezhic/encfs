@@ -7,7 +7,7 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
-router.get('/file-list');
+router.get('/list', controller.list);
 
 router.get('/metadata');
 

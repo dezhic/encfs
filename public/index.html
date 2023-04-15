@@ -52,16 +52,6 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr data-key="0" onclick="selectRow('#tableRight', 0)">
-							<td class="filename-cell">File1</td>
-							<td class="type-cell">Encryption1</td>
-							<td class="label-cell">Key1</td>
-						</tr>
-						<tr data-key="1" onclick="selectRow('#tableRight', 1)">
-							<td class="filename-cell">File2</td>
-							<td class="type-cell">Encryption2</td>
-							<td class="label-cell">Key2</td>
-						</tr>
 					</tbody>
 				</table>
 				<div class="d-flex justify-content-around" style="width: 80%">
@@ -415,6 +405,36 @@
 			}
 		});
 
+		function renderFileList(listData) {
+			$('#tableRight tbody').empty();
+			for (let i = 0; i < listData.length; i++) {
+				let row = $('<tr>');
+				let filenameCell = $('<td>').addClass('filename-cell').text(listData[i].filename);
+				let typeCell = $('<td>').addClass('type-cell').text(listData[i].type === "passphrase" ? "Passphrase" : "Public Key");
+				let labelCell = $('<td>').addClass('label-cell').text(listData[i].label);
+				row.append(filenameCell);
+				row.append(typeCell);
+				row.append(labelCell);
+				row.attr('data-key', i);
+				row.click(() => selectRow('#tableRight', i));
+				$('#tableRight tbody').append(row);
+			}
+		}
+
+		function refreshFileList() {
+			$.ajax({
+				url: '/list',
+				type: 'GET',
+				success: (data) => {
+					renderFileList(data.data);
+				},
+				error: (err) => {
+					alert(err);
+					console.log(err);
+				}
+			});
+		}
+		refreshFileList();
 	</script>
 
 </body>

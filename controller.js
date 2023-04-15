@@ -22,7 +22,15 @@ module.exports = {
             }
             res.json({ status: "success" });
         });
+    },
 
-    }
+    list: async function (req, res) {
+        db.all('SELECT filename, key_type AS type, key_label AS label FROM Repository', [], (err, rows) => {
+            if (err) {
+                res.json({ status: "error", message: err.message });
+            }
+            res.json({ status: "success", data: rows });
+        });
+    },
 
 }
