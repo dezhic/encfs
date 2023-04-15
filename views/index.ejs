@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>File Management System</title>
+	<!-- Bootstrap 5 CSS -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.1/css/bootstrap.min.css">
+	<!-- JQuery -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<!-- Bootstrap 5 JS -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+	<div class="row">
+		<!-- Left Column -->
+		<div class="col-md-6">
+			<h2>Keys</h2>
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Label</th>
+						<th>Type</th>
+						<th>Content</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Key1</td>
+						<td>Type1</td>
+						<td><a href="#" data-bs-toggle="modal" data-bs-target="#myModal">Link1</a></td>
+					</tr>
+					<tr>
+						<td>Key2</td>
+						<td>Type2</td>
+						<td><a href="#" data-bs-toggle="modal" data-bs-target="#myModal">Link2</a></td>
+					</tr>
+				</tbody>
+			 </table>
+			 <div class="btn-group">
+				<button type="button" class="btn btn-primary">Generate</button>
+				<button type="button" class="btn btn-primary">Import</button>
+				<button type="button" class="btn btn-primary">Export</button>
+				<button type="button" class="btn btn-danger">Delete</button>
+			</div>
+		</div>
+		<!-- Right Column -->
+		<div class="col-md-6">
+			<h2>Files</h2>
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Filename</th>
+						<th>Encryption Type</th>
+						<th>Key Label</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>File1</td>
+						<td>Encryption1</td>
+						<td>Key1</td>
+					</tr>
+					<tr>
+						<td>File2</td>
+						<td>Encryption2</td>
+						<td>Key2</td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="btn-group">
+				<button type="button" class="btn btn-primary">Upload</button>
+				<button type="button" class="btn btn-primary">Download</button>
+				<button type="button" class="btn btn-primary">Rename</button>
+				<button type="button" class="btn btn-danger">Delete</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal -->
+<!-- <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class -->

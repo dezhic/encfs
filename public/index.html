@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>File Management System</title>
+	<!-- Bootstrap 5 CSS -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.1/css/bootstrap.min.css">
+	<!-- JQuery -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<!-- Bootstrap 5 JS -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.1/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+
+	<div class="container">
+		<div class="row">
+			<!-- Left Column -->
+			<div class="col-md-6">
+				<h2>Keys</h2>
+				<table id="tableLeft" class="table">
+					<thead>
+						<tr>
+							<th>Label</th>
+							<th>Type</th>
+							<th>Content</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr data-key="0" onclick="selectRow('#tableLeft', 0)">
+							<td>Key1</td>
+							<td>Type1</td>
+							<td><a href="#" data-bs-toggle="modal" data-bs-target="#myModal">Link1</a></td>
+						</tr>
+						<tr data-key="1" onclick="selectRow('#tableLeft', 1)">
+							<td>Key2</td>
+							<td>Type2</td>
+							<td><a href="#" data-bs-toggle="modal" data-bs-target="#myModal">Link2</a></td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="d-flex justify-content-around" style="width: 80%">
+					<button type="button" class="btn btn-primary">Generate</button>
+					<button type="button" class="btn btn-secondary">Import</button>
+					<button type="button" class="btn btn-secondary">Export</button>
+					<button type="button" class="btn btn-danger">Delete</button>
+				</div>
+			</div>
+			<!-- Right Column -->
+			<div class="col-md-6">
+				<h2>Files</h2>
+				<table id="tableRight" class="table">
+					<thead>
+						<tr>
+							<th>Filename</th>
+							<th>Encryption Type</th>
+							<th>Key Label</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr data-key="0" onclick="selectRow('#tableRight', 0)">
+							<td>File1</td>
+							<td>Encryption1</td>
+							<td>Key1</td>
+						</tr>
+						<tr data-key="1" onclick="selectRow('#tableRight', 1)">
+							<td>File2</td>
+							<td>Encryption2</td>
+							<td>Key2</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="d-flex justify-content-around" style="width: 80%">
+					<button type="button" class="btn btn-primary">Upload</button>
+					<button type="button" class="btn btn-secondary">Download</button>
+					<button type="button" class="btn btn-secondary">Rename</button>
+					<button type="button" class="btn btn-danger">Delete</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal -->
+	<!-- <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class -->
+	<script>
+		// Global variables for selected keys
+		var selectedKeyLeft = null;
+		var selectedKeyRight = null;
+
+		// Function to handle row selection
+		function selectRow(table, key) {
+			// Clear previous selection
+			$(table + ' tbody tr').removeClass('table-primary').removeClass('table-secondary');
+			// Add selection to current row
+			$(table + ' tbody tr[data-key="' + key + '"]').addClass('table-primary');
+			// Store selected key as global variable
+			if (table == '#tableLeft') {
+				selectedKeyLeft = key;
+			} else if (table == '#tableRight') {
+				selectedKeyRight = key;
+			}
+		}
+
+		$(document).ready(function () {
+			// Function to handle deselection of rows when clicking outside tables
+			$(document).on('click', function (event) {
+				if (!$(event.target).closest('#tableLeft').length) {
+					$('#tableLeft').find('tr.table-primary').removeClass('table-primary').addClass('table-secondary');
+				} else {
+					$('#tableLeft').find('tr.table-secondary').removeClass('table-secondary').addClass('table-primary');
+				}
+				if (!$(event.target).closest('#tableRight').length) {
+					$('#tableRight').find('tr.table-primary').removeClass('table-primary').addClass('table-secondary');
+				} else {
+					$('#tableRight').find('tr.table-secondary').removeClass('table-secondary').addClass('table-primary');
+				}
+			});
+		});
+
+	</script>
+
+</body>
+
+</html>
