@@ -74,7 +74,7 @@
 					</tbody>
 				</table>
 				<div class="d-flex justify-content-around" style="width: 80%">
-					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
+					<button id="upload-btn" type="button" class="btn btn-primary" data-bs-toggle="modal"
 						data-bs-target="#uploadModal">Upload</button>
 					<button id="download-btn" type="button" disabled class="btn btn-secondary" data-bs-toggle="modal"
 						data-bs-target="#downloadModal">Download</button>
@@ -95,7 +95,7 @@
 				</div>
 				<div class="modal-body">
 					<div class="mb-3">
-						<label for="fileSelection" class="form-label">File</label>
+						<label for="fileSelection" class="form-label">Plain File</label>
 						<div class="input-group">
 							<input type="text" class="form-control" id="fileSelection" readonly>
 							<button class="btn btn-outline-secondary" type="button" id="selectFileBtn">Select
@@ -103,38 +103,15 @@
 						</div>
 					</div>
 					<div class="mb-3">
-						<label for="filenameInput" class="form-label">Filename</label>
+						<label for="filenameInput" class="form-label">Encrypted Filename</label>
 						<input type="text" class="form-control" id="filenameInput">
 					</div>
-					<!-- <div class="mb-3">
-						<fieldset>
-							<legend class="form-label">Encryption Type</legend>
-							<div class="form-check">
-								<input class="form-check-input" type="radio" name="encryptionType" id="passphraseRadio"
-									value="passphrase" checked>
-								<label class="form-check-label" for="passphraseRadio">
-									Passphrase
-								</label>
-							</div>
-							<div class="form-check">
-								<input class="form-check-input" type="radio" name="encryptionType" id="publicKeyRadio"
-									value="publickey">
-								<label class="form-check-label" for="publicKeyRadio">
-									Public Key
-								</label>
-							</div>
-						</fieldset>
+					<div class="form-group">
+						<label for="upload-key-select" class="col-form-label">Select Key:</label>
+						<select class="form-control" id="upload-key-select">
+							<!-- Options will be added dynamically via JavaScript -->
+						</select>
 					</div>
-					<div class="mb-3" id="passphraseInput">
-						<label for="passphrase" class="form-label">Passphrase</label>
-						<input type="password" class="form-control" id="passphrase">
-					</div>
-					<div class="mb-3 d-none" id="publicKeyInput">
-						<label for="publicKeyTextarea" class="form-label">Public Key</label>
-						<textarea class="form-control" id="publicKeyTextarea" rows="5" readonly></textarea>
-						<button class="btn btn-outline-secondary mt-2" type="button" id="selectPublicKeyBtn">Select
-							File...</button>
-					</div> -->
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -211,12 +188,12 @@
 
 					<div id="passphraseSection" class="form-group mt-3">
 						<label for="passphraseInput">Input a passphrase</label>
-						<input type="text" class="form-control" id="passphraseInput"
-							placeholder="Enter a passphrase">
+						<input type="text" class="form-control" id="passphraseInput" placeholder="Enter a passphrase">
 					</div>
 
 					<div class="d-none align-items-center mt-3" id="publicKeySection">
-						<button type="button" class="btn btn-primary" id="generatePublicKeyBtn">Generate Key Pair</button>
+						<button type="button" class="btn btn-primary" id="generatePublicKeyBtn">Generate Key
+							Pair</button>
 						<div class="ms-3">
 							<div class="form-group">
 								<label for="publicKeyTextarea">Public Key</label>
@@ -283,21 +260,36 @@
 			});
 		});
 
-		// Upload Modal
-		// $(document).ready(function () {
-		// 	// Show/hide passphrase/public key input fields based on selected encryption type
-		// 	$('input[name="encryptionType"]').change(function () {
-		// 		if ($(this).val() === 'passphrase') {
-		// 			$('#passphraseInput').removeClass('d-none');
-		// 			$('#publicKeyInput').addClass('d-none');
-		// 		} else if ($(this).val() === 'publickey') {
-		// 			$('#passphraseInput').addClass('d-none');
-		// 			$('#publicKeyInput').removeClass('d-none');
-		// 		}
-		// 	});
-		// });
+		// Handle click on Upload button
+		$("#upload-btn").click(function () {
 
-		// Handle click on Download button in row
+			// Clear previous options in key select
+			$("#upload-key-select").empty();
+			$("#upload-key-select").append($('<option>', {
+				value: "",
+				text: "Select a Key",
+				disabled: true,
+				selected: true
+			}));
+
+			// Add options for each row in tableLeft
+			$("#tableLeft tbody tr").each(function (index) {
+				var label = $(this).find(".label-cell").text();
+				var type = $(this).find(".type-cell").text();
+				var key = label + "-" + type;
+
+				$("#upload-key-select").append($('<option>', {
+					value: index,
+					text: key,
+				}));
+			});
+
+			// Show modal
+			$("#uploadModal").modal("show");
+		});
+
+
+		// Handle click on Download button
 		$("#download-btn").on("click", function () {
 			// Get filename, encryption type, and key label
 			// selectedKeyRight = $("#tableRight tbody tr.table-primary").data("key");
@@ -314,6 +306,12 @@
 
 			// Clear previous options in key select
 			$("#download-key-select").empty();
+			$("#download-key-select").append($('<option>', {
+				value: "",
+				text: "Select a Key",
+				disabled: true,
+				selected: true
+			}));
 
 			// Add options for each row in tableLeft
 			$("#tableLeft tbody tr").each(function (index) {
