@@ -48,6 +48,11 @@ $('#saveKeyBtn').click(function () {
         return;
     }
 
+    if (allKeys.some((key) => key.label === label)) {
+        alert('Label already exists.');
+        return;
+    }
+
     if (type === 'publicKey') {
         if (pubB64 == null || privB64 == null) {
             alert('Please generate a key pair first.');
