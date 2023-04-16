@@ -15,6 +15,6 @@ router.get('/content', controller.getContent);
 
 router.post('/upload', controller.upload);
 
-router.post('/rename');
+router.post('/delete', controller.delete);
 
 module.exports = router;

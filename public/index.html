@@ -232,6 +232,26 @@
 		</div>
 	</div>
 
+	<!-- Delete File Confirm Modal -->
+	<div class="modal fade" id="deleteFileConfirmModal" tabindex="-1" aria-labelledby="deleteFileConfirmModalLabel"
+		aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="deleteFileConfirmModalLabel">Delete Key</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p>Confirm deleting file <b id="confirm-del-file"></b>?</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-danger" id="deleteFileBtn">Delete</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<script src="/javascripts/main.bundle.js"></script>
 	<script>
 		$("#create-btn").click(function () {
@@ -262,6 +282,30 @@
 			$("#deleteKeyConfirmModal").modal('hide');
 			$("#key-delete-btn").prop("disabled", true);
 			renderKeyTable();
+		});
+
+		$("#file-delete-btn").click(function () {
+			let selectedFileRow = $("#tableRight tbody tr.table-primary, #tableRight tbody tr.table-secondary");
+			let fileName = $(selectedFileRow).find('.filename-cell');
+			$("#confirm-del-file").text($(fileName).text());
+			$("#deleteFileConfirmModal").modal('show');
+		});
+
+		$("#deleteFileBtn").click(function () {
+			let selectedFileRow = $("#tableRight tbody tr.table-primary, #tableRight tbody tr.table-secondary");
+			let fileName = $(selectedFileRow).find('.filename-cell');
+			$.ajax({
+				url: '/delete',
+				data: {
+					filename: $(fileName).text()
+				},
+				type: 'POST',
+				success: function (result) {
+					$("#deleteFileConfirmModal").modal('hide');
+					$("#file-delete-btn").prop("disabled", true);
+					refreshFileList();
+				}
+			});
 		});
 
 		// Global variables for selected keys

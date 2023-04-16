@@ -53,4 +53,14 @@ module.exports = {
         });
     },
 
+    delete: async function (req, res) {
+        let filename = req.body.filename;
+        db.run('DELETE FROM Repository WHERE filename = ?', [filename], function (err) {
+            if (err) {
+                res.json({ status: "error", message: err.message });
+            }
+            res.json({ status: "success" });
+        });
+    },
+
 }
