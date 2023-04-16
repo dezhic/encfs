@@ -78,10 +78,11 @@ $("#modal-upload-btn").click(function () {
                 if (data.status === "error") {
                     alert(data.message);
                 } else {
-                    alert("File uploaded successfully.");
-                    $('#modal-upload-btn').html('Upload');
                     $('#modal-upload').modal('hide');
-                    location.reload();
+                    $('#modal-upload-btn').html('Upload');
+                    $('#modal-upload-btn').prop('disabled', false);
+                    refreshFileList();
+                    alert("File uploaded successfully.");
                 }
             }
         });
@@ -104,13 +105,13 @@ $("#modal-upload-btn").click(function () {
 
 
     } else if (keyType === 'publicKey') {
-        let publicKey = base64ToArrayBuffer(key.content);
-
-        rsaEnc(base64ToArrayBuffer(btoa(JSON.stringify(fileMetadata))), publicKey).then((cipher) => {
+        let metadataArrayBuffer = new TextEncoder().encode(JSON.stringify(fileMetadata)).buffer;
+        global.window.metadataArrayBuffer = metadataArrayBuffer;
+        rsaEnc(metadataArrayBuffer, key.content).then((cipher) => {
             metadataCipher = arrayBufferToBase64(cipher);
             console.log("metadataCipher: ");
             console.log(metadataCipher);
-            rsaEnc(fileContent, publicKey).then((cipher) => {
+            rsaEnc(fileContent, key.content).then((cipher) => {
                 contentCipher = arrayBufferToBase64(cipher);
                 console.log("contentCipher: ");
                 console.log(contentCipher);

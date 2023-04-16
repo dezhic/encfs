@@ -1,7 +1,7 @@
-function rsaEnc(data, pubKey) {
-    console.log('pubKey in Enc');
-    console.log(new Uint8Array(pubKey));
+const { base64ToArrayBuffer } = require("./utils");
 
+function rsaEnc(data, pubKey) {
+    pubKey = base64ToArrayBuffer(pubKey);
     return new Promise((resolve, reject) => {
         global.window.crypto.subtle.importKey(
             "spki",
@@ -33,29 +33,24 @@ function rsaEnc(data, pubKey) {
     });
 }
 
+/**
+ * 
+ * @param {ArrayBuffer} cipher
+ * @param {String} privKey base64 encoded
+ * @returns 
+ */
 function rsaDec(cipher, privKey) {
+    privKey = base64ToArrayBuffer(privKey);
     return new Promise((resolve, reject) => {
-        global.window.crypto.subtle.importKey(
-            "pkcs8",
-            privKey,
-            {
-                name: "RSA-OAEP",
-                hash: { name: "SHA-256" },
-            },
-            true,
-            ["decrypt"]
-        ).then((key) => {
-            global.window.crypto.subtle.decrypt(
-                {
-                    name: "RSA-OAEP",
-                },
-                key,
-                cipher
-            ).then((data) => {
-                resolve(data);
-            });
+        const worker = new Worker('/javascripts/workers/rsa-dec.bundle.js');
+        worker.onmessage = function (e) {
+            if (e.data instanceof Error) {
+                reject(e.data);
+            } else {
+                resolve(e.data);
+            }
         }
-        );
+        worker.postMessage({ cipher, privKey });
     });
 }
 

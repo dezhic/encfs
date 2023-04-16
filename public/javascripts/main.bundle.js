@@ -39,9 +39,10 @@ function passphraseDec(cipher, passphrase) {
 module.exports = { passphraseEnc, passphraseDec };
 
 },{}],2:[function(require,module,exports){
+(function (global){(function (){
 const { passphraseDec } = require("./aes");
 const { rsaDec } = require("./rsa");
-const { base64ToArrayBuffer } = require("./utils");
+const { base64ToArrayBuffer, arrayBufferToBase64 } = require("./utils");
 
 let metadataCipher;
 let contentCipher;
@@ -130,11 +131,9 @@ function downloadContent(filename, metadata, type, key) {
                 });
 
             } else {
-                rsaDec(contentCipher, key.content).then((plain) => {
-                    contentPlain = atob(plain);
-                    console.log("contentPlain: ");
-                    console.log(atob(contentPlain));
-                    saveFile(contentPlain, metadata);
+                rsaDec(base64ToArrayBuffer(contentCipher), key.content).then((plain) => {
+                    console.log(plain);
+                    saveFile(plain, metadata);
                 }).catch((err) => {
                     console.log('rsaDec error: ');
                     console.log(err);
@@ -196,11 +195,24 @@ $("#modal-download-btn").on("click", function () {
             return;
         });
     } else {
-        // TODO
+        global.window.metadataCipher = metadataCipher;
+        global.window.key = key;
+        rsaDec(base64ToArrayBuffer(metadataCipher), key.content).then((plain) => {
+            metadataPlain = new TextDecoder().decode(plain);
+            metadataPlain = JSON.parse(metadataPlain);
+            downloadContent(filename, metadataPlain, type, key);
+        }).catch((err) => {
+            console.log(err);
+            alert("Incorrect private key.");
+            $("#modal-download-btn").prop("disabled", false);
+            $("#modal-download-btn").html("Download");
+            return;
+        });
     }
 
 });
 
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./aes":1,"./rsa":5,"./utils":7}],3:[function(require,module,exports){
 (function (global){(function (){
 const { arrayBufferToBase64 } = require("./utils");
@@ -302,10 +314,10 @@ require('./keygen');
 require('./download');
 },{"./download":2,"./keygen":3,"./upload":6}],5:[function(require,module,exports){
 (function (global){(function (){
-function rsaEnc(data, pubKey) {
-    console.log('pubKey in Enc');
-    console.log(new Uint8Array(pubKey));
+const { base64ToArrayBuffer } = require("./utils");
 
+function rsaEnc(data, pubKey) {
+    pubKey = base64ToArrayBuffer(pubKey);
     return new Promise((resolve, reject) => {
         global.window.crypto.subtle.importKey(
             "spki",
@@ -337,36 +349,32 @@ function rsaEnc(data, pubKey) {
     });
 }
 
+/**
+ * 
+ * @param {ArrayBuffer} cipher
+ * @param {String} privKey base64 encoded
+ * @returns 
+ */
 function rsaDec(cipher, privKey) {
+    privKey = base64ToArrayBuffer(privKey);
     return new Promise((resolve, reject) => {
-        global.window.crypto.subtle.importKey(
-            "pkcs8",
-            privKey,
-            {
-                name: "RSA-OAEP",
-                hash: { name: "SHA-256" },
-            },
-            true,
-            ["decrypt"]
-        ).then((key) => {
-            global.window.crypto.subtle.decrypt(
-                {
-                    name: "RSA-OAEP",
-                },
-                key,
-                cipher
-            ).then((data) => {
-                resolve(data);
-            });
+        const worker = new Worker('/javascripts/workers/rsa-dec.bundle.js');
+        worker.onmessage = function (e) {
+            if (e.data instanceof Error) {
+                reject(e.data);
+            } else {
+                resolve(e.data);
+            }
         }
-        );
+        worker.postMessage({ cipher, privKey });
     });
 }
 
 module.exports = { rsaEnc, rsaDec };
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],6:[function(require,module,exports){
+},{"./utils":7}],6:[function(require,module,exports){
+(function (global){(function (){
 const { passphraseEnc, passphraseDec } = require("./aes");
 const { rsaEnc, rsaDec } = require("./rsa");
 const { base64ToArrayBuffer, arrayBufferToBase64 } = require("./utils");
@@ -447,10 +455,11 @@ $("#modal-upload-btn").click(function () {
                 if (data.status === "error") {
                     alert(data.message);
                 } else {
-                    alert("File uploaded successfully.");
-                    $('#modal-upload-btn').html('Upload');
                     $('#modal-upload').modal('hide');
-                    location.reload();
+                    $('#modal-upload-btn').html('Upload');
+                    $('#modal-upload-btn').prop('disabled', false);
+                    refreshFileList();
+                    alert("File uploaded successfully.");
                 }
             }
         });
@@ -473,13 +482,13 @@ $("#modal-upload-btn").click(function () {
 
 
     } else if (keyType === 'publicKey') {
-        let publicKey = base64ToArrayBuffer(key.content);
-
-        rsaEnc(base64ToArrayBuffer(btoa(JSON.stringify(fileMetadata))), publicKey).then((cipher) => {
+        let metadataArrayBuffer = new TextEncoder().encode(JSON.stringify(fileMetadata)).buffer;
+        global.window.metadataArrayBuffer = metadataArrayBuffer;
+        rsaEnc(metadataArrayBuffer, key.content).then((cipher) => {
             metadataCipher = arrayBufferToBase64(cipher);
             console.log("metadataCipher: ");
             console.log(metadataCipher);
-            rsaEnc(fileContent, publicKey).then((cipher) => {
+            rsaEnc(fileContent, key.content).then((cipher) => {
                 contentCipher = arrayBufferToBase64(cipher);
                 console.log("contentCipher: ");
                 console.log(contentCipher);
@@ -497,6 +506,7 @@ $("#modal-upload-btn").click(function () {
 
 });
 
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./aes":1,"./rsa":5,"./utils":7}],7:[function(require,module,exports){
 module.exports.arrayBufferToBase64 = function (buffer) {
     return btoa(new Uint8Array(buffer));

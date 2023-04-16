@@ -1,6 +1,6 @@
 const { passphraseDec } = require("./aes");
 const { rsaDec } = require("./rsa");
-const { base64ToArrayBuffer } = require("./utils");
+const { base64ToArrayBuffer, arrayBufferToBase64 } = require("./utils");
 
 let metadataCipher;
 let contentCipher;
@@ -89,11 +89,9 @@ function downloadContent(filename, metadata, type, key) {
                 });
 
             } else {
-                rsaDec(contentCipher, key.content).then((plain) => {
-                    contentPlain = atob(plain);
-                    console.log("contentPlain: ");
-                    console.log(atob(contentPlain));
-                    saveFile(contentPlain, metadata);
+                rsaDec(base64ToArrayBuffer(contentCipher), key.content).then((plain) => {
+                    console.log(plain);
+                    saveFile(plain, metadata);
                 }).catch((err) => {
                     console.log('rsaDec error: ');
                     console.log(err);
@@ -155,7 +153,19 @@ $("#modal-download-btn").on("click", function () {
             return;
         });
     } else {
-        // TODO
+        global.window.metadataCipher = metadataCipher;
+        global.window.key = key;
+        rsaDec(base64ToArrayBuffer(metadataCipher), key.content).then((plain) => {
+            metadataPlain = new TextDecoder().decode(plain);
+            metadataPlain = JSON.parse(metadataPlain);
+            downloadContent(filename, metadataPlain, type, key);
+        }).catch((err) => {
+            console.log(err);
+            alert("Incorrect private key.");
+            $("#modal-download-btn").prop("disabled", false);
+            $("#modal-download-btn").html("Download");
+            return;
+        });
     }
 
 });
