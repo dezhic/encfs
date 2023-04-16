@@ -14,24 +14,31 @@
 </head>
 
 <body>
+	<nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
+		<div class="container-fluid">
+			<a class="navbar-brand mx-3" href="#">File Management System</a>
+		</div>
+	</nav>
 
-	<div class="container">
+	<div class="container" style="max-width: 90%;">
 		<div class="row">
 			<!-- Left Column -->
 			<div class="col-md-6">
 				<h2>Keys</h2>
-				<table id="tableLeft" class="table" style="width: 100%; table-layout: fixed;">
-					<thead>
-						<tr>
-							<th style="width: 25%;">Label</th>
-							<th style="width: 25%;">Type</th>
-							<th style="width: 50%;">Content</th>
-						</tr>
-					</thead>
-					<tbody>
-						<!-- updated by js -->
-					</tbody>
-				</table>
+				<div class="m-2" style="display: block; height: 60vh; overflow-y: auto;">
+					<table id="tableLeft" class="table" style="width: 100%; table-layout: fixed;">
+						<thead>
+							<tr>
+								<th style="width: 25%;">Label</th>
+								<th style="width: 25%;">Type</th>
+								<th style="width: 50%;">Content</th>
+							</tr>
+						</thead>
+						<tbody>
+							<!-- updated by js -->
+						</tbody>
+					</table>
+				</div>
 				<div class="d-flex justify-content-around" style="width: 80%">
 					<button id="create-btn" type="button" class="btn btn-primary">Create</button>
 					<button id="key-delete-btn" disabled type="button" class="btn btn-danger">Delete</button>
@@ -40,17 +47,19 @@
 			<!-- Right Column -->
 			<div class="col-md-6">
 				<h2>Files</h2>
-				<table id="tableRight" class="table">
-					<thead>
-						<tr>
-							<th>Encrypted File</th>
-							<th>Encryption Type</th>
-							<th>Key Label</th>
-						</tr>
-					</thead>
-					<tbody>
-					</tbody>
-				</table>
+				<div class="m-2" style="display: block; height: 60vh; overflow-y: auto;">
+					<table id="tableRight" class="table">
+						<thead>
+							<tr>
+								<th>Encrypted File</th>
+								<th>Encryption Type</th>
+								<th>Key Label</th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
 				<div class="d-flex justify-content-around" style="width: 80%">
 					<button id="upload-btn" type="button" class="btn btn-primary" data-bs-toggle="modal"
 						data-bs-target="#uploadModal">Upload</button>
@@ -189,11 +198,13 @@
 						<div class="ms-3">
 							<div class="form-group">
 								<label for="publicKeyTextarea">Public Key</label>
-								<textarea class="form-control" id="publicKeyTextarea" rows="5" placeholder="Input or generate public key"></textarea>
+								<textarea class="form-control" id="publicKeyTextarea" rows="5"
+									placeholder="Input or generate public key"></textarea>
 							</div>
 							<div class="form-group">
 								<label for="privateKeyTextarea">Private Key</label>
-								<textarea class="form-control" id="privateKeyTextarea" rows="5" placeholder="Input or generate private key"></textarea>
+								<textarea class="form-control" id="privateKeyTextarea" rows="5"
+									placeholder="Input or generate private key"></textarea>
 							</div>
 						</div>
 					</div>
