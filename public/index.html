@@ -212,6 +212,26 @@
 		</div>
 	</div>
 
+	<!-- Delete Key Confirm Modal -->
+	<div class="modal fade" id="deleteKeyConfirmModal" tabindex="-1" aria-labelledby="deleteKeyConfirmModalLabel"
+		aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="deleteKeyConfirmModalLabel">Delete Key</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p>Confirm deleting <span id="confirm-del-type"></span> <b id="confirm-del-label"></b>?</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-danger" id="deleteKeyBtn">Delete</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<script src="/javascripts/main.bundle.js"></script>
 	<script>
 		$("#create-btn").click(function () {
@@ -222,6 +242,26 @@
 			$("#privateKeyTextarea").prop('readonly', false);
 			$("#keyLabelInput").val("");
 			$("#keyGenerationModal").modal('show');
+		});
+
+		$("#key-delete-btn").click(function () {
+			$("#deleteKeyConfirmModal").modal('show');
+			let selectedKeyRow = $("#tableLeft tbody tr.table-primary, #tableLeft tbody tr.table-secondary");
+			let keyLabel = $(selectedKeyRow).find('.label-cell');
+			let keyType = $(selectedKeyRow).find('.type-cell');
+			$("#confirm-del-label").text($(keyLabel).text());
+			$("#confirm-del-type").text($(keyType).text());
+		});
+
+		$("#deleteKeyBtn").click(function () {
+			let allKeys = JSON.parse(localStorage.getItem('keys'));
+			let selectedKeyRow = $("#tableLeft tbody tr.table-primary, #tableLeft tbody tr.table-secondary");
+			let keyIndex = $(selectedKeyRow).attr('data-key');
+			allKeys.splice(keyIndex, 1);
+			localStorage.setItem('keys', JSON.stringify(allKeys));
+			$("#deleteKeyConfirmModal").modal('hide');
+			$("#key-delete-btn").prop("disabled", true);
+			renderKeyTable();
 		});
 
 		// Global variables for selected keys
