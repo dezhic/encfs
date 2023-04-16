@@ -25,10 +25,12 @@ function rsaEnc(data, pubKey) {
                 resolve(cipher);
             }).catch((err) => {
                 console.log(err);
+                reject(err);
             });
         }
         ).catch((err) => {
             console.log(err);
+            reject(err);
         });
     });
 }

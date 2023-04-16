@@ -354,10 +354,12 @@ function rsaEnc(data, pubKey) {
                 resolve(cipher);
             }).catch((err) => {
                 console.log(err);
+                reject(err);
             });
         }
         ).catch((err) => {
             console.log(err);
+            reject(err);
         });
     });
 }
@@ -469,7 +471,7 @@ $("#modal-upload-btn").click(function () {
                 if (data.status === "error") {
                     alert(data.message);
                 } else {
-                    $('#modal-upload').modal('hide');
+                    $('#uploadModal').modal('hide');
                     $('#modal-upload-btn').html('Upload');
                     $('#modal-upload-btn').prop('disabled', false);
                     refreshFileList();
@@ -513,6 +515,10 @@ $("#modal-upload-btn").click(function () {
                 $('#modal-upload-btn').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...');
                 upload();
             });
+        }).catch((err) => {
+            alert("Error: " + err + ". Maybe you selected an invalid key.");
+            $('#modal-upload-btn').html('Upload');
+            $('#modal-upload-btn').prop('disabled', false);
         });
 
     } else {
