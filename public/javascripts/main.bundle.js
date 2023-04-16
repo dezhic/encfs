@@ -241,9 +241,9 @@ function generateKeyPair() {
     );
 }
 
-var privB64, pubB64;
 // Generate public key and private key
 $('#generateKeyPairBtn').click(function () {
+    let privB64, pubB64;
     generateKeyPair().then((keyPair) => {
         window.crypto.subtle.exportKey(
             "spki",
@@ -252,19 +252,21 @@ $('#generateKeyPairBtn').click(function () {
             console.log('pubKey before encoding');
             console.log(new Uint8Array(publicKey));
             pubB64 = arrayBufferToBase64(publicKey);
-            $('#publicKeyTextarea').val(pubB64);
+            $('#publicKeyTextarea').val(pubB64).prop('readonly', true);
         });
         window.crypto.subtle.exportKey(
             "pkcs8",
             keyPair.privateKey
         ).then((privateKey) => {
             privB64 = arrayBufferToBase64(privateKey);
-            $('#privateKeyTextarea').val(privB64);
+            $('#privateKeyTextarea').val(privB64).prop('readonly', true);
         });
     });
 });
 
 $('#saveKeyBtn').click(function () {
+    let pubB64 = $('#publicKeyTextarea').val();
+    let privB64 = $('#privateKeyTextarea').val();
     let allKeys = JSON.parse(localStorage.getItem('keys'));
     if (allKeys == null) {
         allKeys = [];
@@ -285,7 +287,7 @@ $('#saveKeyBtn').click(function () {
 
     if (type === 'publicKey') {
         if (pubB64 == null || privB64 == null) {
-            alert('Please generate a key pair first.');
+            alert('Please generate or input a key pair first.');
             return;
         }
         allKeys.push({
