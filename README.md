@@ -24,6 +24,7 @@ There are options to
 ![Main UI](./pics/main.png)
 
 __Create Keys__
+
 Click the _Create_ button to create a new passphrase or public key pair.
 
 For passphrase, you can specify the passphrase in the input box. For public key pair, you can either paste existing keys in the text area, or click the _Generate_ button to generate a new key pair.
