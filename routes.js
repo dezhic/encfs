@@ -9,9 +9,9 @@ router.get('/', function(req, res, next) {
 
 router.get('/list', controller.list);
 
-router.get('/metadata');
+router.get('/metadata', controller.getMetadata);
 
-router.get('/content');
+router.get('/content', controller.getContent);
 
 router.post('/upload', controller.upload);
 

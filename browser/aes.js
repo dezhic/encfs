@@ -23,7 +23,11 @@ function passphraseEnc(data, passphrase) {
  */
 function passphraseDec(cipher, passphrase) {
     return new Promise((resolve, reject) => {
-        CryptoJS.AES.decrypt(cipher, passphrase).toString();
+        const worker = new Worker('/javascripts/workers/aes-dec.bundle.js');
+        worker.onmessage = function (e) {
+            resolve(e.data);
+        }
+        worker.postMessage({ cipher, passphrase });
     });
 }
 

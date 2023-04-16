@@ -33,4 +33,24 @@ module.exports = {
         });
     },
 
+    getMetadata: async function (req, res) {
+        let filename = req.query.filename;
+        db.get('SELECT metadata_cipher AS metadataCipher FROM Repository WHERE filename = ?', [filename], (err, row) => {
+            if (err) {
+                res.json({ status: "error", message: err.message });
+            }
+            res.json({ status: "success", data: row });
+        });
+    },
+
+    getContent: async function (req, res) {
+        let filename = req.query.filename;
+        db.get('SELECT content_cipher AS contentCipher FROM Repository WHERE filename = ?', [filename], (err, row) => {
+            if (err) {
+                res.json({ status: "error", message: err.message });
+            }
+            res.json({ status: "success", data: row });
+        });
+    },
+
 }
