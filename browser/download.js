@@ -89,11 +89,12 @@ function downloadContent(filename, metadata, type, key) {
                 });
 
             } else {
-                rsaDec(base64ToArrayBuffer(contentCipher), key.content).then((plain) => {
-                    console.log(plain);
-                    saveFile(plain, metadata);
+                passphraseDec(contentCipher, metadata.secret).then((plain) => {
+                    contentPlain = atob(plain);  // AES output (base64) -> plain text (base64)
+                    contentPlain = base64ToArrayBuffer(contentPlain); // plain text (base64) -> plain text (arrayBuffer)
+                    saveFile(contentPlain, metadata);
                 }).catch((err) => {
-                    console.log('rsaDec error: ');
+                    console.log("passphraseDec error: ")
                     console.log(err);
                     alert(err);
                 });

@@ -104,22 +104,25 @@ $("#modal-upload-btn").click(function () {
         });
 
 
-    } else if (keyType === 'publicKey') {
+    } else if (keyType === 'publicKey') {  // We use the hybrid encryption scheme RSA + AES
+        // Generate symmetric key (passphrase), equivalent to AES-256
+        let secret = window.crypto.getRandomValues(new Uint8Array(32)).join('');
+        // Append to the metadata
+        fileMetadata.secret = secret;
         let metadataArrayBuffer = new TextEncoder().encode(JSON.stringify(fileMetadata)).buffer;
         global.window.metadataArrayBuffer = metadataArrayBuffer;
         rsaEnc(metadataArrayBuffer, key.content).then((cipher) => {
             metadataCipher = arrayBufferToBase64(cipher);
             console.log("metadataCipher: ");
             console.log(metadataCipher);
-            rsaEnc(fileContent, key.content).then((cipher) => {
-                contentCipher = arrayBufferToBase64(cipher);
+            passphraseEnc(arrayBufferToBase64(fileContent), secret).then((cipher) => {
+                contentCipher = cipher;
                 console.log("contentCipher: ");
                 console.log(contentCipher);
                 $('#modal-upload-btn').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...');
                 upload();
             });
         });
-
 
     } else {
         alert("Please select an encryption type.");

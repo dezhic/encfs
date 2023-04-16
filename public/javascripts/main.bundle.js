@@ -15,6 +15,7 @@ function passphraseEnc(data, passphrase) {
             } else {
                 resolve(e.data);
             }
+            worker.terminate();
         }
         worker.postMessage({ data, passphrase });
     });
@@ -30,7 +31,12 @@ function passphraseDec(cipher, passphrase) {
     return new Promise((resolve, reject) => {
         const worker = new Worker('/javascripts/workers/aes-dec.bundle.js');
         worker.onmessage = function (e) {
-            resolve(e.data);
+            if (e.data instanceof Error) {
+                reject(e.data);
+            } else {
+                resolve(e.data);
+            }
+            worker.terminate();
         }
         worker.postMessage({ cipher, passphrase });
     });
@@ -131,11 +137,12 @@ function downloadContent(filename, metadata, type, key) {
                 });
 
             } else {
-                rsaDec(base64ToArrayBuffer(contentCipher), key.content).then((plain) => {
-                    console.log(plain);
-                    saveFile(plain, metadata);
+                passphraseDec(contentCipher, metadata.secret).then((plain) => {
+                    contentPlain = atob(plain);  // AES output (base64) -> plain text (base64)
+                    contentPlain = base64ToArrayBuffer(contentPlain); // plain text (base64) -> plain text (arrayBuffer)
+                    saveFile(contentPlain, metadata);
                 }).catch((err) => {
-                    console.log('rsaDec error: ');
+                    console.log("passphraseDec error: ")
                     console.log(err);
                     alert(err);
                 });
@@ -365,6 +372,7 @@ function rsaDec(cipher, privKey) {
             } else {
                 resolve(e.data);
             }
+            worker.terminate();
         }
         worker.postMessage({ cipher, privKey });
     });
@@ -481,22 +489,25 @@ $("#modal-upload-btn").click(function () {
         });
 
 
-    } else if (keyType === 'publicKey') {
+    } else if (keyType === 'publicKey') {  // We use the hybrid encryption scheme RSA + AES
+        // Generate symmetric key (passphrase), equivalent to AES-256
+        let secret = window.crypto.getRandomValues(new Uint8Array(32)).join('');
+        // Append to the metadata
+        fileMetadata.secret = secret;
         let metadataArrayBuffer = new TextEncoder().encode(JSON.stringify(fileMetadata)).buffer;
         global.window.metadataArrayBuffer = metadataArrayBuffer;
         rsaEnc(metadataArrayBuffer, key.content).then((cipher) => {
             metadataCipher = arrayBufferToBase64(cipher);
             console.log("metadataCipher: ");
             console.log(metadataCipher);
-            rsaEnc(fileContent, key.content).then((cipher) => {
-                contentCipher = arrayBufferToBase64(cipher);
+            passphraseEnc(arrayBufferToBase64(fileContent), secret).then((cipher) => {
+                contentCipher = cipher;
                 console.log("contentCipher: ");
                 console.log(contentCipher);
                 $('#modal-upload-btn').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...');
                 upload();
             });
         });
-
 
     } else {
         alert("Please select an encryption type.");
