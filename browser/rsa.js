@@ -49,6 +49,7 @@ function rsaDec(cipher, privKey) {
             } else {
                 resolve(e.data);
             }
+            worker.terminate();
         }
         worker.postMessage({ cipher, privKey });
     });
