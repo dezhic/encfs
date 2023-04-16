@@ -9,7 +9,11 @@ function passphraseEnc(data, passphrase) {
     return new Promise((resolve, reject) => {
         const worker = new Worker('/javascripts/workers/aes-enc.bundle.js');
         worker.onmessage = function (e) {
-            resolve(e.data);
+            if (e.data instanceof Error) {
+                reject(e.data);
+            } else {
+                resolve(e.data);
+            }
         }
         worker.postMessage({ data, passphrase });
     });

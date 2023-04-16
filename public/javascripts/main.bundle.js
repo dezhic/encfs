@@ -10,7 +10,11 @@ function passphraseEnc(data, passphrase) {
     return new Promise((resolve, reject) => {
         const worker = new Worker('/javascripts/workers/aes-enc.bundle.js');
         worker.onmessage = function (e) {
-            resolve(e.data);
+            if (e.data instanceof Error) {
+                reject(e.data);
+            } else {
+                resolve(e.data);
+            }
         }
         worker.postMessage({ data, passphrase });
     });
@@ -120,6 +124,8 @@ function downloadContent(filename, metadata, type, key) {
                     contentPlain = base64ToArrayBuffer(contentPlain); // plain text (base64) -> plain text (arrayBuffer)
                     saveFile(contentPlain, metadata);
                 }).catch((err) => {
+                    console.log("passphraseDec error: ")
+                    console.log(err);
                     alert(err);
                 });
 
@@ -130,6 +136,8 @@ function downloadContent(filename, metadata, type, key) {
                     console.log(atob(contentPlain));
                     saveFile(contentPlain, metadata);
                 }).catch((err) => {
+                    console.log('rsaDec error: ');
+                    console.log(err);
                     alert(err);
                 });
             }

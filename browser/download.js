@@ -83,6 +83,8 @@ function downloadContent(filename, metadata, type, key) {
                     contentPlain = base64ToArrayBuffer(contentPlain); // plain text (base64) -> plain text (arrayBuffer)
                     saveFile(contentPlain, metadata);
                 }).catch((err) => {
+                    console.log("passphraseDec error: ")
+                    console.log(err);
                     alert(err);
                 });
 
@@ -93,6 +95,8 @@ function downloadContent(filename, metadata, type, key) {
                     console.log(atob(contentPlain));
                     saveFile(contentPlain, metadata);
                 }).catch((err) => {
+                    console.log('rsaDec error: ');
+                    console.log(err);
                     alert(err);
                 });
             }

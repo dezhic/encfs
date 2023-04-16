@@ -386,28 +386,6 @@
 			$("#downloadModal").modal("show");
 		});
 
-		// Handle click on Download button in modal
-		$("#modal-download-btn").on("click", function () {
-			// TODO
-			// Get selected key index
-			var keyIndex = $("#download-key-select").val();
-
-			// Get passphrase or public key based on encryption type
-			var encryptionType = $("#tableLeft tbody tr").eq(keyIndex).find(".type-cell").text();
-			var passphraseOrPublicKey;
-
-			if (encryptionType === "Passphrase") {
-				passphraseOrPublicKey = $("#download-passphrase").val();
-			} else if (encryptionType === "Public Key") {
-				passphraseOrPublicKey = $("#download-public-key").val();
-			}
-
-			// TODO: Implement download functionality
-
-			// Hide modal
-			$("#downloadModal").modal("hide");
-		});
-
 		// Handle Key Generation Modal
 		// Show/hide sections based on the selected key type
 		$('input[name="genKeyType"]').change(function () {
