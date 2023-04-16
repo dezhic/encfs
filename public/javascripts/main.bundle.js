@@ -181,6 +181,10 @@ $("#modal-download-btn").on("click", function () {
     
     // Get key
     var keyIndex = $("#download-key-select").val();
+    if (!keyIndex) {
+        alert("Please select a key.");
+        return;
+    }
     var key = JSON.parse(localStorage.getItem('keys'))[keyIndex];
 
     // Disable button and change text
